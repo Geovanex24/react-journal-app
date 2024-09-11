@@ -19,16 +19,17 @@ import {
   startLoginWithEmailPassword,
 } from "../../store/auth";
 
+const formData = {
+  email: "",
+  password: "",
+};
+
 export const LoginPage = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const dispatch = useDispatch();
   const { status, errorMessage } = useSelector((state) => state.auth);
 
-  const formData = {
-    email: "",
-    password: "",
-  };
   const formValidations = {
     email: [
       (value) => value.includes("@"),
