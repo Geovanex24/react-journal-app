@@ -5,6 +5,7 @@ import {
   savingNewNote,
   setActiveNote,
   setNotes,
+  setPhotosToActiveNote,
   setSaving,
   updateNote,
 } from "./";
@@ -65,6 +66,25 @@ export const startUploadingFiles = (files = []) => {
   return async (dispatch) => {
     dispatch(setSaving());
 
-    await fileUpload(files[0]);
+    // await fileUpload(files[0]);
+
+    /**
+     * Uploading multiple images
+     *
+     * Promise.all => devuelve una respuesta cuando todas las promesas
+     * se han resuelto
+     *
+     * ¡Y es justo lo que necesitamos! Grabar cada una de las imgs simultáneamente.
+     */
+    const fileUploadPromises = [];
+
+    for (const file of files) {
+      // Creando el array de las promesas
+      fileUploadPromises.push(fileUpload(file));
+    }
+
+    const photosUrls = await Promise.all(fileUploadPromises);
+
+    dispatch(setPhotosToActiveNote(photosUrls));
   };
 };
