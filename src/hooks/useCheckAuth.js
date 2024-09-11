@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 
 import { login, logout } from "../store/auth";
+import { startLoadingNotes } from "../store/journal";
 
 export const useCheckAuth = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ export const useCheckAuth = () => {
 
       const { uid, email, displayName, photoURL } = user;
       dispatch(login({ uid, email, displayName, photoURL }));
+      dispatch(startLoadingNotes());
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
