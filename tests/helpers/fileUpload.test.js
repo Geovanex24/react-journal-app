@@ -12,4 +12,11 @@ describe("Pruebas en fileUpload.js", () => {
 
     expect(typeof url).toBe("string");
   });
+
+  test("debe de retornar null", async () => {
+    const file = new File([], "foto1.jpg");
+    const url = await fileUpload(file);
+
+    expect(url).toBe(null);
+  });
 });
