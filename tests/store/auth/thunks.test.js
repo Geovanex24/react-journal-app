@@ -1,5 +1,6 @@
 import {
   loginWithEmailPassword,
+  logoutFirebase,
   registerUserWithEmailPassword,
   signInWithGoogle,
 } from "../../../src/firebase/providers";
@@ -13,7 +14,9 @@ import {
   startCreatingUserWithEmailPassword,
   startGoogleSignIn,
   startLoginWithEmailPassword,
+  startLogout,
 } from "../../../src/store/auth/thunks";
+import { clearNotesLogout } from "../../../src/store/journal";
 import { demoUser } from "../../fixtures/authFixtures";
 
 jest.mock("../../../src/firebase/providers"); // mock de todos los providers... signInWithGoogle...
@@ -120,5 +123,13 @@ describe("Pruebas en AuthThunks", () => {
         photoURL: demoUser.photoURL,
       })
     );
+  });
+
+  test("startLogout debe de llamar logoutFirebase, clearNotes y logout", async () => {
+    await startLogout()(dispatch);
+
+    expect(logoutFirebase).toHaveBeenCalled();
+    expect(dispatch).toHaveBeenCalledWith(clearNotesLogout());
+    expect(dispatch).toHaveBeenCalledWith(logout());
   });
 });
