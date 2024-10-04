@@ -1,4 +1,7 @@
-import { signInWithGoogle } from "../../../src/firebase/providers";
+import {
+  registerUserWithEmailPassword,
+  signInWithGoogle,
+} from "../../../src/firebase/providers";
 import {
   checkingCredentials,
   login,
@@ -6,6 +9,7 @@ import {
 } from "../../../src/store/auth/authSlice";
 import {
   checkingAuthentication,
+  startCreatingUserWithEmailPassword,
   startGoogleSignIn,
 } from "../../../src/store/auth/thunks";
 import { demoUser } from "../../fixtures/authFixtures";
@@ -37,7 +41,10 @@ describe("Pruebas en AuthThunks", () => {
   });
 
   test("startGoogleSignIn debe de llamar checkingCredentials y logout - Error", async () => {
-    const loginData = { ok: false, errorMessage: "Error al iniciar sesión" };
+    const loginData = {
+      ok: false,
+      errorMessage: "Error al iniciar sesión Google",
+    };
 
     await signInWithGoogle.mockResolvedValue(loginData);
 
@@ -46,5 +53,51 @@ describe("Pruebas en AuthThunks", () => {
 
     expect(dispatch).toHaveBeenCalledWith(checkingCredentials());
     expect(dispatch).toHaveBeenCalledWith(logout(loginData));
+  });
+
+  test("startCreatingUserWithEmailPassword debe de llamar checkingCredentials y login - Exito", async () => {
+    const loginData = { ok: true, ...demoUser };
+    const formData = {
+      email: demoUser.email,
+      password: "123456",
+      displayName: demoUser.displayName,
+    };
+
+    await registerUserWithEmailPassword.mockResolvedValue(loginData);
+
+    //thunk
+    await startCreatingUserWithEmailPassword(formData)(dispatch);
+
+    expect(dispatch).toHaveBeenCalledWith(checkingCredentials());
+    expect(dispatch).toHaveBeenCalledWith(
+      login({
+        uid: demoUser.uid,
+        displayName: demoUser.displayName,
+        email: demoUser.email,
+        photoURL: demoUser.photoURL,
+      })
+    );
+  });
+
+  test("startCreatingUserWithEmailPassword debe de llamar checkingCredentials y logout - Error", async () => {
+    const loginData = {
+      ok: false,
+      errorMessage: "Error al iniciar sesión con email y password",
+    };
+    const formData = {
+      email: demoUser.email,
+      password: "123456",
+      displayName: demoUser.displayName,
+    };
+
+    await registerUserWithEmailPassword.mockResolvedValue(loginData);
+
+    //thunk
+    await startCreatingUserWithEmailPassword(formData)(dispatch);
+
+    expect(dispatch).toHaveBeenCalledWith(checkingCredentials());
+    expect(dispatch).toHaveBeenCalledWith(
+      logout({ errorMessage: loginData.errorMessage })
+    );
   });
 });
